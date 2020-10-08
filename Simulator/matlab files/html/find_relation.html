@@ -1,0 +1,324 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>find_relation</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-01"><meta name="DC.source" content="find_relation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [ relation ] = find_relation( verti )
+
+<span class="comment">% Function the forms relations from a given matrix of veritces of all the</span>
+<span class="comment">% obstacles. the relation are fromed by joining all possible vertice points</span>
+<span class="comment">%and joing the vertices to the edges of the boundary</span>
+<span class="comment">%however eliminating those relations which pass through an obstacle.</span>
+<span class="comment">%</span>
+dim = size(verti);
+z=1;
+<span class="keyword">for</span> i=2:dim(1)
+
+    <span class="keyword">for</span> j=1:2:7
+
+        <span class="keyword">for</span> k=i+1:dim(1)
+            <span class="keyword">for</span> l=1:2:7
+                x1 = verti(i,j);
+                y1 = verti(i,j+1);
+                x2 = verti(k,l);
+                y2 = verti(k,l+1);
+                ob1 = i;
+                ob2 = k;
+                <span class="comment">%display('Checking for relation in .......');</span>
+                relation_check = [x1 y1 x2 y2];
+                <span class="comment">%display(relation_check);</span>
+
+                <span class="keyword">if</span>(check_relation(x1,y1,ob1,x2,y2,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;                                  <span class="comment">% Checking relation for a possible intersection with an obstacle</span>
+                    relation(z,3) = x2;
+                    relation(z,4) = y2;
+                    z=z+1;
+                <span class="comment">%display('Relation Formed !   relation matrix updated       ');</span>
+                <span class="keyword">else</span>
+                <span class="comment">%display(' Cannot form a relation ');</span>
+
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=2:dim(1)
+    <span class="keyword">for</span> j=1:2:7
+        x1 = verti(i,j);
+        y1 = verti(i,j+1);
+        x2 = verti(1,1);
+        y2 = y1;                                                 <span class="comment">%Checking relations with boundary elements</span>
+        x3 = x1;
+        y3 = verti(1,2);
+        x4 = verti(1,3);
+        y4 = y1;
+        x5 = x1;
+        y5 = verti(1,6);
+        ob1 =i;
+        ob2 = 1;
+
+        <span class="keyword">if</span>(j == 1 || j == 5)
+        <span class="keyword">if</span>(check_relation(x1,y1,ob1,x2,y2,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x2;                         <span class="comment">% joing only those vertices of obstacles to boundary edges which lie towards the boundary edge</span>
+                    relation(z,4) = y2;
+                    z=z+1;
+        <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span>(j == 1 || j == 3)
+        <span class="keyword">if</span>(check_relation(x1,y1,ob1,x3,y3,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x3;
+                    relation(z,4) = y3;
+                    z=z+1;
+        <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span>( j == 3 || j == 7)
+        <span class="keyword">if</span>(check_relation(x1,y1,ob1,x4,y4,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x4;
+                    relation(z,4) = y4;
+                    z=z+1;
+        <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span>(j == 5 || j == 7)
+        <span class="keyword">if</span>(check_relation(x1,y1,ob1,x5,y5,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x5;
+                    relation(z,4) = y5;
+                    z=z+1;
+        <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+<span class="keyword">end</span>
+<span class="keyword">function</span> [output] = check_relation(x1,y1,ob1,x2,y2,ob2,verti)              <span class="comment">% Checking for a intersection with an obstacle</span>
+dim = size(verti);
+<span class="keyword">for</span> i=2:dim(1)
+    xbox = [verti(i,1) verti(i,3) verti(i,7) verti(i,5) verti(i,1)];
+    ybox = [verti(i,2) verti(i,4) verti(i,8) verti(i,6) verti(i,2)];
+    xline = [x1 x2];
+    yline = [y1 y2];
+    [xi,~] = polyxpoly(xline,yline,xbox,ybox);
+    xi = unique(xi);
+    P = size(xi);
+    <span class="keyword">if</span>(i ~= ob1 &amp;&amp; i ~= ob2)
+    <span class="keyword">if</span>(P(1)&gt;0)
+        output =0;
+        <span class="keyword">break</span>;
+    <span class="keyword">else</span>
+        output =1;
+    <span class="keyword">end</span>
+    <span class="keyword">else</span>
+       <span class="keyword">if</span>(P(1)&gt;1)
+        output =0;
+        <span class="keyword">break</span>;
+    <span class="keyword">else</span>
+        output =1;
+      <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in find_relation (line 8)
+dim = size(verti);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [ relation ] = find_relation( verti )
+
+% Function the forms relations from a given matrix of veritces of all the
+% obstacles. the relation are fromed by joining all possible vertice points
+%and joing the vertices to the edges of the boundary 
+%however eliminating those relations which pass through an obstacle.
+% 
+dim = size(verti);
+z=1;
+for i=2:dim(1)
+    
+    for j=1:2:7
+        
+        for k=i+1:dim(1)
+            for l=1:2:7
+                x1 = verti(i,j);
+                y1 = verti(i,j+1);
+                x2 = verti(k,l);
+                y2 = verti(k,l+1);
+                ob1 = i;
+                ob2 = k;
+                %display('Checking for relation in .......');
+                relation_check = [x1 y1 x2 y2];
+                %display(relation_check);
+                
+                if(check_relation(x1,y1,ob1,x2,y2,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;                                  % Checking relation for a possible intersection with an obstacle
+                    relation(z,3) = x2;
+                    relation(z,4) = y2;
+                    z=z+1;
+                %display('Relation Formed !   relation matrix updated       ');     
+                else
+                %display(' Cannot form a relation ');    
+                 
+                end
+            end
+        end
+    end
+end
+
+for i=2:dim(1)
+    for j=1:2:7
+        x1 = verti(i,j);
+        y1 = verti(i,j+1);
+        x2 = verti(1,1);
+        y2 = y1;                                                 %Checking relations with boundary elements
+        x3 = x1;
+        y3 = verti(1,2);
+        x4 = verti(1,3);
+        y4 = y1;
+        x5 = x1;
+        y5 = verti(1,6);                     
+        ob1 =i;
+        ob2 = 1;
+        
+        if(j == 1 || j == 5)
+        if(check_relation(x1,y1,ob1,x2,y2,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x2;                         % joing only those vertices of obstacles to boundary edges which lie towards the boundary edge 
+                    relation(z,4) = y2;
+                    z=z+1;
+        end
+        end
+        if(j == 1 || j == 3)
+        if(check_relation(x1,y1,ob1,x3,y3,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x3;
+                    relation(z,4) = y3;
+                    z=z+1;
+        end
+        end
+        if( j == 3 || j == 7)
+        if(check_relation(x1,y1,ob1,x4,y4,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x4;
+                    relation(z,4) = y4;
+                    z=z+1;
+        end
+        end
+        if(j == 5 || j == 7)
+        if(check_relation(x1,y1,ob1,x5,y5,ob2,verti))
+                    relation(z,1) = x1;
+                    relation(z,2) = y1;
+                    relation(z,3) = x5;
+                    relation(z,4) = y5;
+                    z=z+1;
+        end
+        end
+    end
+end
+    
+
+end
+function [output] = check_relation(x1,y1,ob1,x2,y2,ob2,verti)              % Checking for a intersection with an obstacle
+dim = size(verti);
+for i=2:dim(1)
+    xbox = [verti(i,1) verti(i,3) verti(i,7) verti(i,5) verti(i,1)];
+    ybox = [verti(i,2) verti(i,4) verti(i,8) verti(i,6) verti(i,2)];         
+    xline = [x1 x2];
+    yline = [y1 y2];
+    [xi,~] = polyxpoly(xline,yline,xbox,ybox);
+    xi = unique(xi);
+    P = size(xi);
+    if(i ~= ob1 && i ~= ob2)
+    if(P(1)>0)
+        output =0;
+        break;
+    else
+        output =1;
+    end
+    else 
+       if(P(1)>1)
+        output =0;
+        break;
+    else
+        output =1;
+      end 
+    end
+end
+end
+##### SOURCE END #####
+--></body></html>

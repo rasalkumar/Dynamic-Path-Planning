@@ -1,0 +1,15 @@
+input = input';
+target = target';
+net = newff(minmax(input),[8 12 6 1], {'logsig','logsig','logsig','logsig','purelin'});
+net = init(net);
+net.trainFcn = 'traingdm';
+net.trainParam.lr = 0.05;
+net.trainParam.mc = 0.9;
+net.trainParam.epochs = 21000;
+%net.trainParam.show = 1000;
+net.trainParam.goal = 1e-4;
+net.trainParam.min_grad = 1e-05;
+net.trainParam.show=NaN;
+net.trainParam.max_fail = 10;
+net = train(net,input,target);
+output = sim(net,input);
